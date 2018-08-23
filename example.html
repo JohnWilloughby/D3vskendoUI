@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+
+	<link rel="stylesheet" href="http://kendo.cdn.telerik.com/2018.2.620/styles/kendo.common-bootstrap.min.css">
+	<link rel="stylesheet" href="http://kendo.cdn.telerik.com/2018.2.620/styles/kendo.bootstrap.min.css">
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<!-- the d3 library -->
+	<script src="http://d3js.org/d3.v4.min.js"></script>
+
+	<script src="http://kendo.cdn.telerik.com/2018.2.620/js/kendo.all.min.js"></script>
+
+	<script>
+
+var data = [454, 660, 721, 746, 808, 704, 775, 756, 688, 733, 693, 564,  537, 628, 630, 611, 600, 640,694, 708 ];
+
+// initialize the chart
+function drawDChart ( ) {
+
+	var svg = d3.select( "#chart1" );
+
+	// set the dimensions and margins of the graph
+	var	margin = 5;
+	var	width =  + svg.attr("width")  - 30;
+	var height = + svg.attr("height") - margin - 40;
+
+	// set the ranges
+
+	var y = d3.scaleLinear()
+		.domain([0,800])
+  	.range([height, 0]);
+
+	var x = d3.scaleLinear()
+		.domain([0, data.length])
+		.range([0, width - 20 ]);
+
+	var g = svg.append("g")
+				.attr("transform", "translate( 0, " + margin + " )" );
+
+// create the y axis
+	g.append("g")
+				.attr("transform","translate( 40, 0 )")
+				.call(d3.axisLeft(y));
+// create the x axis
+	g.append("g")
+				.attr("transform","translate( 40," + height + " )")
+				.call(d3.axisBottom(x));
+
+	// define the tooltips parameters
+	var ttip = d3.select("body")
+		.append("div")
+		.style("position", "absolute")
+		.style("z-index", "10")
+		.style("visibility", "hidden")
+		.style("background", "white");
+
+	// do the heavy lifting
+	g.append("g")
+		.attr("transform","translate(  55, 0 )")
+		.selectAll("rect")
+		.data(data)
+		.enter().append("rect")
+		.attr("width", ( width/data.length - 15 ) )
+		.attr("height", function(d) {return height - y(d); })
+		.attr("x", function(d,i) {return x(i) + 5; })
+		.attr("y", function(d) {return y(d); })
+		.attr("fill", function(d,i) { return "steelblue"})
+		// set the tooltip
+		.on("mouseover", function (d, i) {
+				ttip.style("visibility", "visible" )
+					.style("left",(d3.event.pageX)+"px")
+					.style("top",(d3.event.pageY)+"px")
+					.html("Data: "+d)
+		})
+		.on("mouseout", function() { ttip.style("visibility", "hidden" ) });
+
+};
+
+    function drawKChart( ) {
+        $("#chart2").kendoChart({
+                legend: {
+                    visible: false
+                },
+                seriesDefaults: {
+                    type: "column"
+                },
+                series: [{
+                    data: data,
+										color: "steelblue"
+                }],
+                valueAxis: {
+                    max: 800,
+										majorGridLines: {
+												visible: false
+										}
+                },
+                categoryAxis: {
+                    categories: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
+                    majorGridLines: {
+                        visible: false
+                    }
+                },
+                tooltip: {
+                    visible: true,
+                    template: "Data: #= value #"
+                }
+        });
+    }
+
+		$(document).ready ( function () {
+			drawDChart ( );
+			drawKChart( );
+		});
+
+</script>
+
+</head>
+
+<body>
+
+			<h2>D3 Chart</h2>
+			<svg id="chart1" class="chart" width="600" height="300"></svg>
+
+			<hr/>
+
+			<h2>Kendo UI Chart</h2>
+			<div id="chart2" style="width:600px;height:300px"></div>
+
+</body>
